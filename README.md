@@ -1,44 +1,52 @@
-# CameraTrap
-ESP32-based camera trap with PIR sensor.
+# CameraTrap-Notify
 
-The project aimed to create a cameratrap system. It uses a PIR motion sensor along with the ESP32-CAM microcontroller equipped with an OV2640 camera and a microSD card reader. The camera captures images in response to the PIR motion sensor signal and saves them on the microSD card. Additionally, the ESP32 enables remote access to the system via WiFi, allowing for viewing of captured photos and live view from the camera through a web browser.
+> ESP32-CAM camera trap ที่ตรวจจับความเคลื่อนไหวด้วย PIR sensor แล้วส่งภาพแจ้งเตือนอัตโนมัติไปยัง **Discord** และ/หรือ **Telegram** ทันทีที่ถ่ายภาพ
 
-The functionalities of the project include:
+> **หมายเหตุ:** คำอธิบายและ README นี้เขียนโดย AI (Claude) จากการอ่านซอร์สโค้ดของโปรเจกต์
 
-1. **Motion Detection:** The device can detect motion using a PIR sensor.
-2. **Instant Photo Capture:** Upon detecting motion, the camera immediately captures a photo.
-3. **Storage:** Captured photos are saved onto a microSD card for storage.
-4. **Remote Photo Browsing:** User can remotely browse through a list of all photos taken by the camera.
-5. **Photo Preview:** The system enables user to select a specific photo from the list and view its preview in full resolution.
-6. **Real-time Camera Stream:** Users can remotely access and stream live camera footage.
+---
 
-The picture below illustrates the real system setup on a breadboard.
+## เกี่ยวกับโปรเจกต์
 
-![system](https://github.com/Dyspersja/CameraTrap/assets/146620220/ea7a1eb2-3133-4f78-b81c-57b5ea0341fa)
+โปรเจกต์นี้ต่อยอดมาจาก [Dyspersja/CameraTrap](https://github.com/Dyspersja/CameraTrap) ซึ่งเป็นระบบ camera trap บน ESP32-CAM (AI Thinker) ที่ใช้ PIR sensor ตรวจจับความเคลื่อนไหว ถ่ายภาพ บันทึกลง microSD และดูภาพ/สตรีมสดผ่านเว็บเบราว์เซอร์
 
-## Live View
-Below is a demonstration of live video streaming and viewing it in a web browser at **/stream**.
+สิ่งที่เพิ่มเติมเข้ามาในเวอร์ชันนี้คือ **ระบบแจ้งเตือนอัตโนมัติ**: เมื่อกล้องตรวจพบความเคลื่อนไหวและถ่ายภาพสำเร็จ ระบบจะส่งภาพพร้อมวันเวลาที่ถ่ายไปยัง Discord (ผ่าน Webhook) และ/หรือ Telegram (ผ่าน Bot API) โดยอัตโนมัติ พร้อมระบบซิงค์เวลาแบบ NTP (ตั้งเป็นเวลาไทย UTC+7) เพื่อให้ timestamp ในภาพถูกต้อง
 
-![stream](https://github.com/Dyspersja/CameraTrap/assets/146620220/cf7a3a91-a1b2-4a3f-a9de-00f4efcd2bb1)
+## ฟีเจอร์หลัก
 
-## List of Photos
-A demonstration of the list of photos taken by the camera and saved on the microSD card at **/view**.
+- **ตรวจจับความเคลื่อนไหว** ด้วย PIR sensor แล้วถ่ายภาพทันที
+- **บันทึกภาพ** ลงในการ์ด microSD
+- **ดูรายการภาพย้อนหลัง** และเปิดดูภาพแต่ละรูปผ่านเว็บ (`/view`)
+- **สตรีมภาพสด (Live Stream)** ผ่านเว็บเบราว์เซอร์ (`/stream`)
+- **แจ้งเตือนอัตโนมัติผ่าน Discord** ทันทีที่ถ่ายภาพ (ผ่าน Webhook)
+- **แจ้งเตือนอัตโนมัติผ่าน Telegram** ทันทีที่ถ่ายภาพ (ผ่าน Bot API)
+- **ซิงค์เวลาอัตโนมัติผ่าน NTP** เพื่อประทับวันเวลาที่ถ่ายภาพให้ถูกต้อง (ตั้งค่าเป็นเขตเวลาไทย)
+- เปิด/ปิดการแจ้งเตือนแต่ละช่องทางได้อิสระ
 
-![photolist](https://github.com/Dyspersja/CameraTrap/assets/146620220/d5c540e5-979a-4881-98e3-0b6c0e868fe0)
+## โครงสร้างไฟล์
 
-## Motion Detection
-When motion is detected by the PIR sensor, a photo is automatically taken.
+| ไฟล์ | หน้าที่ |
+|---|---|
+| `CameraTrap.ino` | ไฟล์หลัก: เชื่อมต่อ WiFi, ตั้งค่ากล้อง, วนลูปอ่านค่า PIR, ถ่าย/บันทึกภาพ แล้วเรียกส่งแจ้งเตือน |
+| `NotifySender.h/.cpp` | โมดูลใหม่ที่เพิ่มเข้ามา — ส่งภาพไปยัง Discord/Telegram แบบ multipart form-data และจัดการซิงค์เวลา NTP |
+| `WebHandlers.h/.cpp` | จัดการ request สำหรับดูรายการภาพและดูภาพรายรูป |
+| `AsyncJpegStreamResponse.h/.cpp` | คลาสสำหรับสตรีมภาพสด (MJPEG) ผ่าน HTTP |
+| `camera_pins.h` | กำหนดขาเชื่อมต่อ (pin mapping) ของโมดูลกล้อง OV2640 บนบอร์ด AI Thinker ESP32-CAM |
 
-![PIR](https://github.com/Dyspersja/CameraTrap/assets/146620220/ab5ae56d-8a8a-45d0-885a-23ee73589ce6)
+## การตั้งค่าก่อนใช้งาน
 
-## Special thanks
-Special thanks to the [me-no-dev](https://github.com/me-no-dev).  
-Thanks to his code from one of his GitHub gists, I was able to add functionality to the application for streaming live view from the camera.
+1. เปิดไฟล์ `CameraTrap.ino` แล้วใส่ชื่อ WiFi และรหัสผ่านของคุณแทนค่า placeholder:
+   ```cpp
+   const char *ssid = "ชื่อ WiFi ของคุณ";
+   const char *password = "รหัสผ่าน WiFi ของคุณ";
+   ```
+2. เปิดไฟล์ `NotifySender.h` แล้วตั้งค่าตามช่องทางที่ต้องการใช้:
+   - **Discord**: ใส่ Webhook URL ของช่องที่ต้องการแจ้งเตือนแทน `DISCORD_WEBHOOK_URL`
+   - **Telegram**: ใส่ Bot Token และ Chat ID แทน `TELEGRAM_BOT_TOKEN` และ `TELEGRAM_CHAT_ID`
+   - ปิดช่องทางที่ไม่ใช้ได้โดยตั้งค่า `ENABLE_DISCORD_NOTIFY` หรือ `ENABLE_TELEGRAM_NOTIFY` เป็น `false`
+3. อัปโหลดโค้ดขึ้นบอร์ด **AI Thinker ESP32-CAM**
 
-The gist I mentioned:
-https://gist.github.com/me-no-dev/d34fba51a8f059ac559bf62002e61aa3
+## เครดิต
 
-Another thanks to me-no-dev for the library ESPAsyncWebServer which I used to run the server on my ESP32.
-
-GitHub Repository of the library: 
-https://github.com/me-no-dev/ESPAsyncWebServer
+- โปรเจกต์ต้นฉบับ: [Dyspersja/CameraTrap](https://github.com/Dyspersja/CameraTrap)
+- ส่วนสตรีมภาพสดในต้นฉบับอ้างอิงจากโค้ดของ [me-no-dev](https://github.com/me-no-dev) และไลบรารี [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)

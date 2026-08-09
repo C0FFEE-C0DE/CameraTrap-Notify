@@ -12,4 +12,4 @@
 void handlePhotoRequest(AsyncWebServerRequest *request);
 void handleStreamRequest(AsyncWebServerRequest *request);
 
-#endif  // WEB_HANDLERS_H
+#endif

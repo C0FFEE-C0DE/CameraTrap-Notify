@@ -1,6 +1,14 @@
+// https://github.com/arduino-libraries/NTPClient : 3.2.1
+// https://github.com/ESP32Async/AsyncTCP : 3.5.0
+// https://github.com/ESP32Async/ESPAsyncTCP : 2.0.0
+// https://github.com/ESP32Async/ESPAsyncWebServer : 3.12.0
+// https://github.com/espressif/arduino-esp32 : 3.3.11
+// Run on AI Thinker ESP32-CAM
+
 #include "AsyncJpegStreamResponse.h"
 #include "WebHandlers.h"
 #include "camera_pins.h"
+#include "NotifySender.h"
 
 #include "Arduino.h"
 #include "esp_camera.h"
@@ -10,12 +18,13 @@
 #include "FS.h"
 #include "SD_MMC.h"
 
+
 #define PIR_PIN 13
 
 int photoDone = 0;
 
-const char* ssid = "Test";
-const char* password = "pass1234";
+const char *ssid = "*******************";
+const char *password = "*******************";
 
 AsyncWebServer server(80);
 
@@ -26,6 +35,7 @@ void setup() {
   pinMode(PIR_PIN, INPUT);
 
   connectToWiFi();
+  syncTimeNTP();
   initializeSDCard();
   if (!setupCamera()) return;
 
@@ -59,7 +69,7 @@ void connectToWiFi() {
 }
 
 void initializeSDCard() {
-  if (!SD_MMC.begin()) {
+  if (!SD_MMC.begin("/sdcard", true)) {  // true = 1-bit mode
     Serial.println("Card Mount Failed");
     return;
   }
@@ -89,8 +99,8 @@ bool setupCamera() {
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
 
-  if (psramFound()) {
-    config.frame_size = FRAMESIZE_QQVGA;
+  if(psramFound()){
+    config.frame_size = FRAMESIZE_UXGA; // FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
     config.jpeg_quality = 10;
     config.fb_count = 2;
   } else {
@@ -117,6 +127,9 @@ void captureAndSavePhoto() {
     return;
   }
 
+  // วันเวลาที่ถ่าย (ต้องซิงค์ NTP สำเร็จใน setup() ก่อน)
+  String timestamp = getTimestampString();
+
   // Generate a file name
   String fileName = "/photo" + String(millis()) + ".jpg";
 
@@ -132,7 +145,14 @@ void captureAndSavePhoto() {
   file.write(fb->buf, fb->len);
   Serial.println("Photo saved: " + fileName);
 
-  // Close the file and return the frame buffer
+  // Close the file
   file.close();
+
+  // ส่งภาพ + วันเวลาที่ถ่าย ไปยัง Discord และ/หรือ Telegram
+  // (เปิด/ปิดแต่ละช่องทางได้ที่ NotifyConfig.h)
+  String caption = "Motion detected\n" + timestamp;
+  sendPhotoNotifications(fb->buf, fb->len, caption);
+
+  // Return the frame buffer
   esp_camera_fb_return(fb);
 }
