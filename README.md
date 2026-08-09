@@ -23,6 +23,25 @@ Added in this fork:
 8. **NTP time sync** — accurate local (Thailand, UTC+7) timestamp embedded in every notification caption
 9. Each notification channel can be toggled independently (`ENABLE_DISCORD_NOTIFY`, `ENABLE_TELEGRAM_NOTIFY`)
 
+## setup on a breadboard
+![system](https://github.com/Dyspersja/CameraTrap/assets/146620220/ea7a1eb2-3133-4f78-b81c-57b5ea0341fa)
+
+## Live View
+Below is a demonstration of live video streaming and viewing it in a web browser at **/stream**.
+
+![stream](https://github.com/Dyspersja/CameraTrap/assets/146620220/cf7a3a91-a1b2-4a3f-a9de-00f4efcd2bb1)
+
+## List of Photos
+A demonstration of the list of photos taken by the camera and saved on the microSD card at **/view**.
+
+![photolist](https://github.com/Dyspersja/CameraTrap/assets/146620220/d5c540e5-979a-4881-98e3-0b6c0e868fe0)
+
+## Motion Detection
+When motion is detected by the PIR sensor, a photo is automatically taken.
+
+![PIR](https://github.com/Dyspersja/CameraTrap/assets/146620220/ab5ae56d-8a8a-45d0-885a-23ee73589ce6)
+
+
 ## New files
 
 | File | Purpose |
@@ -74,6 +93,24 @@ Follow the original repo's hardware wiring and Arduino IDE board setup first. Th
 7. **ส่งแจ้งเตือนทันที** — ภาพที่ถ่ายได้พร้อมเวลาถูกส่งไปยัง Discord และ/หรือ Telegram อัตโนมัติผ่าน webhook/bot API
 8. **ซิงค์เวลาผ่าน NTP** — ประทับเวลาท้องถิ่น (ประเทศไทย UTC+7) ที่แม่นยำในทุกข้อความแจ้งเตือน
 9. เปิด/ปิดแต่ละช่องทางแจ้งเตือนแยกกันได้ (`ENABLE_DISCORD_NOTIFY`, `ENABLE_TELEGRAM_NOTIFY`)
+
+## การจัดวางบนบอร์ดทดลอง
+![system](https://github.com/Dyspersja/CameraTrap/assets/146620220/ea7a1eb2-3133-4f78-b81c-57b5ea0341fa)
+
+## การรับชมสด 
+ด้านล่างนี้คือตัวอย่างการสตรีมวิดีโอสดและการรับชมในเว็บเบราว์เซอร์ที่ **/stream**
+
+![stream](https://github.com/Dyspersja/CameraTrap/assets/146620220/cf7a3a91-a1b2-4a3f-a9de-00f4efcd2bb1)
+
+## รายการรูปภาพ 
+ตัวอย่างรายการรูปภาพที่ถ่ายด้วยกล้องและบันทึกไว้ใน microSD การ์ดที่ **/view**
+
+![photolist](https://github.com/Dyspersja/CameraTrap/assets/146620220/d5c540e5-979a-4881-98e3-0b6c0e868fe0)
+
+## การตรวจจับการเคลื่อนไหว
+เมื่อเซ็นเซอร์ PIR ตรวจจับความเคลื่อนไหวได้ ระบบจะถ่ายภาพโดยอัตโนมัติ
+
+![PIR](https://github.com/Dyspersja/CameraTrap/assets/146620220/ab5ae56d-8a8a-45d0-885a-23ee73589ce6)
 
 ## ไฟล์ที่เพิ่มใหม่
 
